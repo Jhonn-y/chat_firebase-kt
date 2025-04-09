@@ -5,24 +5,26 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val context: Context) : ViewModel() {
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
 
-    private var userID: String = ""
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
 
-    fun saveCredential(username: String, password: String) {
-        userID = if (username == "userone") {
+    var userId: String = ""
+    var username:  String = ""
+    var password: String = ""
+
+    fun saveCredentials(username: String, password: String) {
+        userId = if(username == "userone") {
             "1"
         } else {
             "2"
         }
+
         viewModelScope.launch {
             with(sharedPreferences.edit()) {
-                putString("USERID", userID)
+                putString("USERID", userId)
                 putString("USERNAME", username)
                 putString("PASSWORD", password)
                 apply()
@@ -31,13 +33,11 @@ class LoginViewModel(private val context: Context) : ViewModel() {
     }
 }
 
-@Suppress("UNCHECKED_CAST")
 class LoginViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
             return LoginViewModel(context) as T
-        } else {
-            throw IllegalArgumentException()
         }
+        throw IllegalArgumentException("Viewmodel Class Desconhecido")
     }
 }

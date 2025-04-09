@@ -2,6 +2,7 @@ package com.pedromoura.chatfirebase.presentation.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,30 +22,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.pedromoura.chatfirebase.presentation.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    loginViewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(
-            LocalContext.current
-        )
-    ),
-    navController: NavController
-) {
+fun LoginScreen(loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(
+    LocalContext.current)), navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
+    Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
@@ -54,7 +51,7 @@ fun LoginScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 50.dp),
+                .padding(bottom = 50.dp)
         )
 
         OutlinedTextField(
@@ -62,11 +59,10 @@ fun LoginScreen(
             onValueChange = { username = it },
             label = {
                 Text(
-                    text = "Usuario",
+                    text = "Usuário",
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Start
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -74,6 +70,7 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
+
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -81,9 +78,8 @@ fun LoginScreen(
                 Text(
                     text = "Senha",
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(bottom = 8.dp),
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Start
                 )
             },
             visualTransformation = PasswordVisualTransformation(),
@@ -92,12 +88,22 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
+
         Button(
             onClick = {
-                loginViewModel.saveCredential(username = username, password = password)
+                loginViewModel.saveCredentials(username, password)
                 navController.navigate(Screen.Chat.route)
-            },
-
-            ) { Text("Login") }
+            }) {
+            Text("Login")
+        }
     }
+}
+
+@Preview
+@Composable
+fun PreviewLogin() {
+    val navController = rememberNavController()
+    val fakeViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(
+        LocalContext.current))
+    LoginScreen(fakeViewModel, navController)
 }

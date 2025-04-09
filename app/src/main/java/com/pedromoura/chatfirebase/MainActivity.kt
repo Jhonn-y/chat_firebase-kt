@@ -6,12 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import com.pedromoura.chatfirebase.presentation.navigation.NavGraph
 import com.pedromoura.chatfirebase.ui.theme.ChatFirebaseTheme
 
@@ -36,6 +33,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     ChatFirebaseTheme {
-
+        NavGraph()
     }
 }

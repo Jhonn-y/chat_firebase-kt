@@ -18,28 +18,26 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ChatViewModel(
-    private val db: FirebaseDatabase,
-    private val context: Context,
-) : ViewModel() {
+    private val database: FirebaseDatabase,
+    private val context: Context) : ViewModel()
+{
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("log_prefs", Context.MODE_PRIVATE)
-
-    var messagesText by mutableStateOf("")
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
+    var messageText by mutableStateOf("")
+        private set
 
     var username: String = ""
     var password: String = ""
-    var userID: String = ""
+    var userId: String = ""
 
     init {
+        val messageRef = database.reference.child("messages")
 
-        val messageRef = db.reference.child("messages")
-
-        messageRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
+        messageRef.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val messagesList = mutableListOf<Message>()
-                snapshot.children.forEach { child ->
+                dataSnapshot.children.forEach { child ->
                     val message = child.getValue(Message::class.java)
                     message?.let { messagesList.add(it) }
                 }
@@ -48,39 +46,38 @@ class ChatViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                // Tratar os erros
             }
+
         })
     }
 
     fun onMessageTextChanged(text: String) {
-        messagesText = text
+        messageText = text
     }
 
     fun sendMessage() {
         viewModelScope.launch {
             username = sharedPreferences.getString("USERNAME", "") ?: ""
             password = sharedPreferences.getString("PASSWORD", "") ?: ""
-            userID = sharedPreferences.getString("USEID", "") ?: ""
+            userId = sharedPreferences.getString("USERID", "") ?: ""
         }
 
         val newMessage = Message(
             UUID.randomUUID().toString(),
-            messagesText,
-            userID ?: "",
-            System.currentTimeMillis() / 1000L
+            messageText,
+            userId ?: "",
+            System.currentTimeMillis() / 1000L //timestamp em segundos
         )
 
-        db.reference.child("messages").push().setValue(newMessage)
+        database.reference.child("messages").push().setValue(newMessage)
             .addOnSuccessListener {
-
+                //Depois que a message foi salva a gente pode tratar
             }
             .addOnFailureListener {
-
+                // Tratamento de Falhas
             }
 
-        messagesText = ""
+        messageText = ""
     }
-
-
 }
